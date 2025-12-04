@@ -1,9 +1,12 @@
 package com.skola.controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 public class LoginController {
 
@@ -18,12 +21,28 @@ public class LoginController {
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-        // Za početak samo dummy login
         if(username.equals("ucenik") && password.equals("123")) {
-            showAlert("Login uspješan!", "Dobrodošli, " + username);
-        } else {
-            showAlert("Login nije uspio", "Neispravno korisničko ime ili lozinka.");
+            // Otvori Student Dashboard
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/StudentDashboard.fxml"));
+                Stage stage = new Stage();
+                stage.setScene(new Scene(loader.load()));
+
+                // prosledi ime korisnika
+                StudentDashboardController controller = loader.getController();
+                controller.setStudentName(username);
+
+                stage.setTitle("e-Dnevnik - Dashboard");
+                stage.show();
+
+                // zatvori login prozor
+                ((Stage) usernameField.getScene().getWindow()).close();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+
     }
 
     private void showAlert(String title, String message) {
