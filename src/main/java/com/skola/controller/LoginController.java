@@ -1,5 +1,8 @@
 package com.skola.controller;
 
+import com.skola.model.User;
+import com.skola.repository.UserRepository;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -7,6 +10,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class LoginController {
 
@@ -16,45 +21,61 @@ public class LoginController {
     @FXML
     private PasswordField passwordField;
 
+    private UserRepository userRepo = new UserRepository();
+
     @FXML
-    private void handleLogin() {
+    private void handleLogin(ActionEvent event) {
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-        try {
-            Stage stage = new Stage();
+        // Dohvati korisnika iz baze
+        User user = userRepo.getUserByUsernameAndPassword(username, password);
 
-            if(username.equals("ucenik") && password.equals("123")) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/StudentDashboard.fxml"));
-                stage.setScene(new Scene(loader.load()));
-                stage.setTitle("e-Dnevnik - Student Dashboard");
-                StudentDashboardController controller = loader.getController();
-                controller.setStudentName(username);
-            } else if(username.equals("nastavnik") && password.equals("123")) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/TeacherDashboard.fxml"));
-                stage.setScene(new Scene(loader.load()));
-                stage.setTitle("e-Dnevnik - Teacher Dashboard");
-                TeacherDashboardController controller = loader.getController();
-                controller.setTeacherName(username);
-            } else if(username.equals("direktor") && password.equals("123")) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/DirectorDashboard.fxml"));
-                stage.setScene(new Scene(loader.load()));
-                stage.setTitle("e-Dnevnik - Director Dashboard");
-                DirectorDashboardController controller = loader.getController();
-                controller.setDirectorName(username);
-            } else {
-                showAlert("Neispravno korisničko ime ili lozinka", "Pokušajte ponovo.");
-                return;
+        if (user == null) {
+            showAlert("Neispravno korisničko ime ili lozinka", "Pokušajte ponovo.");
+        } else {
+            // Otvori odgovarajući dashboard
+            try {
+                Stage stage = new Stage();
+                FXMLLoader loader;
+                switch (user.getRole()) {
+                    case "ucenik":
+                        loader = new FXMLLoader(getClass().getResource("/view/StudentDashboard.fxml"));
+                        stage.setScene(new Scene(loader.load()));
+                        stage.setTitle("e-Dnevnik - Student Dashboard");
+                        StudentDashboardController studentController = loader.getController();
+                        studentController.setStudentName(username);
+                        break;
+                    case "nastavnik":
+                        loader = new FXMLLoader(getClass().getResource("/view/TeacherDashboard.fxml"));
+                        stage.setScene(new Scene(loader.load()));
+                        stage.setTitle("e-Dnevnik - Teacher Dashboard");
+                        TeacherDashboardController teacherController = loader.getController();
+                        teacherController.setTeacherName(username);
+                        break;
+                    case "direktor":
+                        loader = new FXMLLoader(getClass().getResource("/view/DirectorDashboard.fxml"));
+                        stage.setScene(new Scene(loader.load()));
+                        stage.setTitle("e-Dnevnik - Director Dashboard");
+                        DirectorDashboardController directorController = loader.getController();
+                        directorController.setDirectorName(username);
+                        break;
+                    default:
+                        showAlert("Greška", "Nepoznata uloga korisnika.");
+                        return;
+                }
+
+                stage.show();
+
+                // Zatvori login prozor
+                Stage loginStage = (Stage) usernameField.getScene().getWindow();
+                loginStage.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-            stage.show();
-            ((Stage) usernameField.getScene().getWindow()).close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
-
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
