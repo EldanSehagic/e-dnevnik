@@ -21,29 +21,40 @@ public class LoginController {
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-        if(username.equals("ucenik") && password.equals("123")) {
-            // Otvori Student Dashboard
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/StudentDashboard.fxml"));
-                Stage stage = new Stage();
-                stage.setScene(new Scene(loader.load()));
+        try {
+            Stage stage = new Stage();
 
-                // prosledi ime korisnika
+            if(username.equals("ucenik") && password.equals("123")) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/StudentDashboard.fxml"));
+                stage.setScene(new Scene(loader.load()));
+                stage.setTitle("e-Dnevnik - Student Dashboard");
                 StudentDashboardController controller = loader.getController();
                 controller.setStudentName(username);
-
-                stage.setTitle("e-Dnevnik - Dashboard");
-                stage.show();
-
-                // zatvori login prozor
-                ((Stage) usernameField.getScene().getWindow()).close();
-
-            } catch (Exception e) {
-                e.printStackTrace();
+            } else if(username.equals("nastavnik") && password.equals("123")) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/TeacherDashboard.fxml"));
+                stage.setScene(new Scene(loader.load()));
+                stage.setTitle("e-Dnevnik - Teacher Dashboard");
+                TeacherDashboardController controller = loader.getController();
+                controller.setTeacherName(username);
+            } else if(username.equals("direktor") && password.equals("123")) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/DirectorDashboard.fxml"));
+                stage.setScene(new Scene(loader.load()));
+                stage.setTitle("e-Dnevnik - Director Dashboard");
+                DirectorDashboardController controller = loader.getController();
+                controller.setDirectorName(username);
+            } else {
+                showAlert("Neispravno korisničko ime ili lozinka", "Pokušajte ponovo.");
+                return;
             }
-        }
 
+            stage.show();
+            ((Stage) usernameField.getScene().getWindow()).close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
 
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
