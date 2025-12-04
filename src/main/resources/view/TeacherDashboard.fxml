@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+
+<?import javafx.scene.layout.HBox?>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.skola.controller.TeacherDashboardController"
+      spacing="10" alignment="center" style="-fx-padding: 20;">
+
+    <Label text="Dobrodošli, Nastavnik!" fx:id="welcomeLabel"/>
+
+    <TableView fx:id="studentsTable" prefWidth="400" prefHeight="200">
+        <columns>
+            <TableColumn text="Učenik" fx:id="studentColumn" prefWidth="200"/>
+            <TableColumn text="Ocjena" fx:id="gradeColumn" prefWidth="100"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="10">
+        <Button text="Dodaj ocjenu" onAction="#handleAddGrade"/>
+        <Button text="Obriši ocjenu" onAction="#handleDeleteGrade"/>
+    </HBox>
+</VBox>
