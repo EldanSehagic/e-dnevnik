@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StudentRepository {
 
@@ -35,6 +37,31 @@ public class StudentRepository {
         }
 
         return student;
+    }
+
+    // Dohvati sve studente
+    public List<Student> getAllStudents() {
+        List<Student> students = new ArrayList<>();
+        String sql = "SELECT * FROM Student";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                students.add(new Student(
+                        rs.getInt("id"),
+                        rs.getString("ime"),
+                        rs.getString("prezime"),
+                        rs.getString("smjer")
+                ));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return students;
     }
 
     // Dodaj studenta
