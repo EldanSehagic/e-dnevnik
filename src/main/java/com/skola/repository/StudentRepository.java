@@ -3,34 +3,41 @@ package com.skola.repository;
 import com.skola.model.Student;
 import com.skola.util.Database;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class StudentRepository {
 
-    public List<Student> getAllStudents() {
-        List<Student> students = new ArrayList<>();
-        String sql = "SELECT * FROM Student";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+    // Dohvati jednog studenta po imenu (ili username ako postoji)
+    public Student getStudentByUsername(String username) {
+        Student student = null;
+        String sql = "SELECT * FROM Student WHERE ime = ?"; // koristi "ime" iz baze
 
-            while(rs.next()) {
-                students.add(new Student(
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                student = new Student(
                         rs.getInt("id"),
                         rs.getString("ime"),
                         rs.getString("prezime"),
                         rs.getString("smjer")
-                ));
+                );
             }
 
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-        return students;
+
+        return student;
     }
 
+    // Dodaj studenta
     public void addStudent(Student student) {
         String sql = "INSERT INTO Student (ime, prezime, smjer) VALUES (?, ?, ?)";
         try (Connection conn = Database.getConnection();
@@ -41,11 +48,12 @@ public class StudentRepository {
             stmt.setString(3, student.getSmjer());
             stmt.executeUpdate();
 
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    // Obriši studenta po ID
     public void deleteStudent(int studentId) {
         String sql = "DELETE FROM Student WHERE id = ?";
         try (Connection conn = Database.getConnection();
@@ -54,7 +62,7 @@ public class StudentRepository {
             stmt.setInt(1, studentId);
             stmt.executeUpdate();
 
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
