@@ -29,7 +29,35 @@ public class GradeRepository {
                 g.setStudentId(rs.getInt("student_id"));
                 g.setSubjectId(rs.getInt("subject_id"));
                 g.setOcjena(rs.getInt("ocjena"));
-                g.setSubjectName(rs.getString("subject_name")); // ključna promjena
+                g.setSubjectName(rs.getString("subject_name"));
+                grades.add(g);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return grades;
+    }
+
+    // Dohvati sve ocjene svih učenika (za nastavnika)
+    public List<Grade> getAllGrades() {
+        List<Grade> grades = new ArrayList<>();
+        String sql = "SELECT g.id, g.student_id, g.subject_id, g.ocjena, s.name AS subject_name " +
+                "FROM Grade g " +
+                "JOIN Subject s ON g.subject_id = s.id";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                Grade g = new Grade();
+                g.setId(rs.getInt("id"));
+                g.setStudentId(rs.getInt("student_id"));
+                g.setSubjectId(rs.getInt("subject_id"));
+                g.setOcjena(rs.getInt("ocjena"));
+                g.setSubjectName(rs.getString("subject_name"));
                 grades.add(g);
             }
 
